@@ -77,8 +77,7 @@ export default function SettingsPage() {
               onChange={(e) => setProvider(e.target.value)}
               className="w-full px-3 py-2 rounded-lg bg-[#090d16] border border-slate-700 text-slate-200 focus:outline-none focus:border-cyan-500 font-mono text-xs"
             >
-              <option value="ollama">Ollama (Local Open-Weight Model)</option>
-              <option value="mock">Mock Provider (Deterministic Demo Mode)</option>
+              <option value="ollama">Ollama (Local Open-Weight Model Engine)</option>
             </select>
           </div>
 

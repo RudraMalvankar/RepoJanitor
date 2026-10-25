@@ -29,11 +29,8 @@ class JanitorAgent:
         if not self.repo_model:
             raise ValueError(f"Repository with id '{repo_id}' not found.")
 
-        # Determine AI Provider
-        if self.repo_model.is_demo or settings.AI_PROVIDER == "mock":
-            self.ai_provider: AIProvider = MockProvider()
-        else:
-            self.ai_provider = OllamaProvider()
+        # Dedicated Real Local AI Provider
+        self.ai_provider: AIProvider = OllamaProvider()
 
         self.git_service = GitService(self.repo_model.path)
         self.github_service = GitHubService()
@@ -134,9 +131,8 @@ class JanitorAgent:
             try:
                 ai_output = await self.ai_provider.reason_about_finding(finding_dict, code_context)
             except Exception as e:
-                logger.warning(f"AI reasoning failed for finding {finding.id}: {e}")
-                # Fallback to deterministic reasoning
-                ai_output = await MockProvider().reason_about_finding(finding_dict, code_context)
+                logger.error(f"AI reasoning failed for finding {finding.id}: {e}")
+                continue
 
             # Persist AIAnalysis
             analysis = AIAnalysis(

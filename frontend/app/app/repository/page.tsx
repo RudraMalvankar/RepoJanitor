@@ -32,18 +32,6 @@ export default function RepositorySelectionPage() {
     }
   };
 
-  const handleQuickDemo = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const repo = await api.startDemo();
-      router.push(`/app?repo_id=${repo.id}`);
-    } catch (err: any) {
-      setError(err?.message || "Failed to start demo repository.");
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="max-w-2xl mx-auto space-y-8 font-mono">
       <div className="text-center space-y-2">
@@ -102,28 +90,6 @@ export default function RepositorySelectionPage() {
           <span>{loading ? "Scanning Repository..." : "Scan & Analyze Codebase"}</span>
         </button>
       </form>
-
-      {/* Demo Repository Quick Option */}
-      <div className="p-5 rounded-xl border border-slate-800/80 bg-[#0c1220]/60 flex items-center justify-between text-xs">
-        <div className="space-y-0.5">
-          <div className="text-white font-semibold flex items-center gap-1.5">
-            <span>Try Built-in Demo Repository</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
-              Messy by design
-            </span>
-          </div>
-          <div className="text-slate-500 text-[11px]">Includes duplicate helpers, broken README links, stale TODOs, and tests.</div>
-        </div>
-
-        <button
-          onClick={handleQuickDemo}
-          disabled={loading}
-          className="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5 font-semibold text-xs shrink-0"
-        >
-          <Play className="w-3.5 h-3.5 fill-slate-200" />
-          <span>Load Demo</span>
-        </button>
-      </div>
     </div>
   );
 }

@@ -32,10 +32,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!repoId) {
-      // Auto-load demo if no repo selected
-      api.startDemo().then((r) => {
-        router.replace(`/app?repo_id=${r.id}`);
-      });
+      router.replace("/app/repository");
       return;
     }
 

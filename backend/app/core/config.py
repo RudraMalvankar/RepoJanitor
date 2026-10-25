@@ -10,9 +10,9 @@ class Settings(BaseSettings):
     
     # AI Configuration
     AI_PROVIDER: str = "ollama"  # "ollama" or "mock"
-    OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "qwen2.5:7b"
-    AI_TIMEOUT_SECONDS: int = 45
+    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
+    AI_TIMEOUT_SECONDS: int = int(os.getenv("AI_TIMEOUT_SECONDS", "30"))
     
     # GitHub Integration
     GITHUB_TOKEN: Optional[str] = None

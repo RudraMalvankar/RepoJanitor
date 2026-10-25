@@ -61,9 +61,7 @@ async def update_settings(update: SettingsUpdate):
 async def create_or_scan_repo(payload: RepositoryCreate, db: Session = Depends(get_db)):
     repo_path = payload.path
     if not repo_path:
-        # Default to current workspace demo-repository if not specified
-        demo_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "demo-repository"))
-        repo_path = demo_dir
+        raise HTTPException(status_code=400, detail="Repository path is required.")
 
     if not os.path.exists(repo_path):
         raise HTTPException(status_code=404, detail=f"Repository path does not exist on disk: {repo_path}")
@@ -76,7 +74,7 @@ async def create_or_scan_repo(payload: RepositoryCreate, db: Session = Depends(g
             name=repo_name,
             path=repo_path,
             url=payload.url,
-            is_demo=("demo" in repo_path.lower())
+            is_demo=False
         )
         db.add(repo)
         db.commit()
@@ -374,39 +372,3 @@ def get_activity(repo_id: str, db: Session = Depends(get_db)):
             created_at=e.created_at
         ))
     return res
-
-@router.post("/demo/start", response_model=RepositoryResponse)
-async def start_demo(db: Session = Depends(get_db)):
-    """Initializes and runs full demonstration scan on demo-repository."""
-    demo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "demo-repository"))
-    os.makedirs(demo_path, exist_ok=True)
-
-    repo = db.query(Repository).filter(Repository.path == demo_path).first()
-    if not repo:
-        repo = Repository(
-            name="demo-repository",
-            path=demo_path,
-            url="https://github.com/demo/demo-repository",
-            is_demo=True,
-            current_branch="main"
-        )
-        db.add(repo)
-        db.commit()
-        db.refresh(repo)
-
-    agent = JanitorAgent(db, repo.id)
-    await agent.run_scan()
-    db.refresh(repo)
-
-    return RepositoryResponse(
-        id=repo.id,
-        name=repo.name,
-        path=repo.path,
-        url=repo.url,
-        current_branch=repo.current_branch,
-        is_demo=repo.is_demo,
-        health_score=repo.health_score,
-        health_breakdown=json.loads(repo.health_breakdown),
-        created_at=repo.created_at,
-        updated_at=repo.updated_at
-    )

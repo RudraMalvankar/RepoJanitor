@@ -82,11 +82,6 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             <span className="font-medium text-slate-200">
               {repo ? repo.name : "Select Repository"}
             </span>
-            {repo?.is_demo && (
-              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">
-                Demo
-              </span>
-            )}
           </div>
 
           {repo && (
@@ -102,7 +97,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             <Cpu className="w-3.5 h-3.5 text-cyan-400" />
             <span className="text-slate-400">AI:</span>
             <span className={healthStatus?.ollama_available ? "text-emerald-400" : "text-amber-400"}>
-              {healthStatus?.ollama_available ? "Ollama (qwen2.5:7b)" : "Mock/Demo Provider"}
+              {healthStatus?.ollama_available ? "Ollama (llama3.2:1b)" : "Ollama (Offline)"}
             </span>
           </div>
 

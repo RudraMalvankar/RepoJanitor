@@ -19,7 +19,6 @@ import { api } from "@/lib/api";
 
 export default function LandingPage() {
   const router = useRouter();
-  const [loadingDemo, setLoadingDemo] = useState(false);
   const [terminalStep, setTerminalStep] = useState(0);
 
   // Progressive terminal visual animation
@@ -30,15 +29,8 @@ export default function LandingPage() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleStartDemo = async () => {
-    try {
-      setLoadingDemo(true);
-      const repo = await api.startDemo();
-      router.push(`/app?repo_id=${repo.id}`);
-    } catch (err) {
-      alert("Demo could not be started: " + err);
-      setLoadingDemo(false);
-    }
+  const handleStart = () => {
+    router.push("/app/repository");
   };
 
   return (
@@ -57,17 +49,10 @@ export default function LandingPage() {
           <Link href="#architecture" className="text-slate-400 hover:text-white transition">Safety</Link>
           <Link 
             href="/app/repository" 
-            className="px-3.5 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+            className="px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-sm transition flex items-center gap-2"
           >
-            Custom Repo
+            Launch RepoJanitor
           </Link>
-          <button
-            onClick={handleStartDemo}
-            disabled={loadingDemo}
-            className="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-sm transition flex items-center gap-2"
-          >
-            {loadingDemo ? "Launching..." : "Try Demo"}
-          </button>
         </div>
       </header>
 
@@ -89,14 +74,13 @@ export default function LandingPage() {
 
         {/* Call to actions */}
         <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-          <button
-            onClick={handleStartDemo}
-            disabled={loadingDemo}
+          <Link
+            href="/app/repository"
             className="px-6 py-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-950/40 text-base transition flex items-center gap-2 font-mono group"
           >
             <span>🦥 Clean My Repo</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-          </button>
+          </Link>
 
           <Link
             href="/app/repository"
@@ -118,14 +102,14 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-2 text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>LIVE DEMO SCAN</span>
+              <span>LIVE ACTIVE SCAN</span>
             </div>
           </div>
 
           <div className="space-y-1.5 text-slate-300 py-1">
             <div className="text-emerald-400 font-bold">REPOJANITOR</div>
             <div className="text-slate-600">────────────────────────────────────────</div>
-            <div className="text-slate-400">Scanning repository: <span className="text-white">demo-repository</span>...</div>
+            <div className="text-slate-400">Scanning repository: <span className="text-white">active project</span>...</div>
             
             {terminalStep >= 1 && <div className="text-emerald-400">✓ 247 files indexed</div>}
             {terminalStep >= 2 && <div className="text-emerald-400">✓ Git history & working branch analyzed</div>}
@@ -141,20 +125,20 @@ export default function LandingPage() {
             )}
             {terminalStep >= 5 && (
               <div className="pt-2 text-slate-300">
-                <span>AI reasoning with local model (qwen2.5:7b)...</span>
+                <span>AI reasoning with local model (llama3.2:1b)...</span>
                 <div className="text-emerald-400">[████████████████████░░] 88% — 4 Safe Fixes Verified</div>
               </div>
             )}
             {terminalStep >= 6 && (
               <div className="pt-2 text-emerald-400 font-bold flex items-center justify-between">
                 <span>✓ Health score calculated: 62 → 92 / 100</span>
-                <button 
-                  onClick={handleStartDemo}
+                <Link 
+                  href="/app/repository"
                   className="text-xs bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded hover:bg-emerald-500/30 transition flex items-center gap-1.5"
                 >
                   <Play className="w-3 h-3 fill-emerald-300" />
-                  View Interactive Findings
-                </button>
+                  Connect Your Repository
+                </Link>
               </div>
             )}
           </div>
