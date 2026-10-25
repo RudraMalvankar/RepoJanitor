@@ -1,186 +1,328 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { 
-  Sparkles, 
-  Terminal, 
-  ShieldCheck, 
-  GitBranch, 
-  Cpu, 
-  CheckCircle2, 
-  ArrowRight, 
-  FolderGit2, 
-  Layers, 
-  Play
+import {
+  ShieldCheck,
+  CheckCircle2,
+  GitBranch,
+  Terminal,
+  Cpu,
+  ArrowRight,
+  Sparkles,
+  Search,
+  FileCheck2,
+  Trash2,
+  FileText,
+  Clock,
+  ExternalLink
 } from "lucide-react";
-import { api } from "@/lib/api";
+import { RepoInput } from "@/components/RepoInput";
 
 export default function LandingPage() {
-  const router = useRouter();
-  const [terminalStep, setTerminalStep] = useState(0);
-
-  // Progressive terminal visual animation
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTerminalStep((prev) => (prev < 6 ? prev + 1 : prev));
-    }, 450);
-    return () => clearInterval(timer);
-  }, []);
-
-  const handleStart = () => {
-    router.push("/app/repository");
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-emerald-500/20">
-      {/* Top Navbar */}
-      <header className="border-b border-slate-800/80 px-6 py-4 flex items-center justify-between backdrop-blur-md bg-[#090d16]/80 sticky top-0 z-50">
+    <div className="flex min-h-screen flex-col bg-[#090d16] text-zinc-100 selection:bg-emerald-500/30 selection:text-white font-sans">
+      {/* Top Navigation */}
+      <header className="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-[#0b101d]/90 backdrop-blur sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">🦥</span>
-          <span className="font-bold tracking-tight text-lg text-white font-mono">RepoJanitor</span>
-          <span className="text-xs px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-mono">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition">
+            <span className="text-2xl">🦥</span>
+            <span className="font-extrabold tracking-tight text-white font-mono text-lg">
+              RepoJanitor
+            </span>
+          </Link>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-950/40 text-emerald-300 font-semibold">
             Hacktoberfest 2026
           </span>
         </div>
-        <div className="flex items-center gap-4 text-sm font-mono">
-          <Link href="#features" className="text-slate-400 hover:text-white transition">Features</Link>
-          <Link href="#architecture" className="text-slate-400 hover:text-white transition">Safety</Link>
-          <Link 
-            href="/app/repository" 
-            className="px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-sm transition flex items-center gap-2"
+
+        <nav className="flex items-center gap-5 text-xs font-mono text-slate-300">
+          <a href="#features" className="hover:text-emerald-400 transition hidden sm:inline">
+            Features
+          </a>
+          <a href="#how-it-works" className="hover:text-emerald-400 transition hidden sm:inline">
+            How It Works
+          </a>
+          <a href="#roasts" className="hover:text-emerald-400 transition hidden md:inline">
+            Roasts
+          </a>
+          <a
+            href="https://github.com/RudraMalvankar/RepoJanitor"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-white transition flex items-center gap-1.5"
           >
-            Launch RepoJanitor
+            <span>GitHub</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+          <Link
+            href="/app"
+            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center gap-1.5 shadow-sm"
+          >
+            <span>Dashboard</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-        </div>
+        </nav>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1 max-w-6xl mx-auto px-6 py-16 flex flex-col items-center text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-900/60 text-xs text-slate-400 font-mono mb-8">
-          <Cpu className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Local Open-Weight AI • Ollama Qwen2.5 / Mock Provider</span>
-        </div>
+      {/* Main Content */}
+      <main className="flex-1">
+        {/* HERO SECTION */}
+        <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24">
+          <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[360px] bg-emerald-500/10 rounded-full blur-[140px]" />
 
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white max-w-3xl leading-[1.15] mb-6">
-          Your code is messy.<br />
-          <span className="text-emerald-400">You don't have to be.</span>
-        </h1>
-
-        <p className="text-lg md:text-xl text-slate-400 max-w-2xl mb-10 leading-relaxed font-normal">
-          RepoJanitor uses open-weight AI to find, understand, and safely clean the repository maintenance you've been putting off.
-        </p>
-
-        {/* Call to actions */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-          <Link
-            href="/app/repository"
-            className="px-6 py-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-950/40 text-base transition flex items-center gap-2 font-mono group"
-          >
-            <span>🦥 Clean My Repo</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-          </Link>
-
-          <Link
-            href="/app/repository"
-            className="px-6 py-3.5 rounded-lg border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-medium text-base transition flex items-center gap-2 font-mono"
-          >
-            <FolderGit2 className="w-4 h-4 text-slate-400" />
-            <span>Scan Local Repository</span>
-          </Link>
-        </div>
-
-        {/* Live Terminal Hero Visual */}
-        <div className="w-full max-w-3xl rounded-xl border border-slate-800 bg-[#0c1220] p-4 text-left shadow-2xl relative font-mono text-sm overflow-hidden">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 text-xs text-slate-500">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
-              <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-              <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
-              <span className="ml-2 text-slate-400">repojanitor-agent — zsh</span>
+          <div className="relative mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-950/30 text-emerald-400 text-xs font-mono mb-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Week 3: &quot;Slow and Steady&quot; — The AI Maintainer for Lazy Developers</span>
             </div>
-            <div className="flex items-center gap-2 text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>LIVE ACTIVE SCAN</span>
-            </div>
-          </div>
 
-          <div className="space-y-1.5 text-slate-300 py-1">
-            <div className="text-emerald-400 font-bold">REPOJANITOR</div>
-            <div className="text-slate-600">────────────────────────────────────────</div>
-            <div className="text-slate-400">Scanning repository: <span className="text-white">active project</span>...</div>
-            
-            {terminalStep >= 1 && <div className="text-emerald-400">✓ 247 files indexed</div>}
-            {terminalStep >= 2 && <div className="text-emerald-400">✓ Git history & working branch analyzed</div>}
-            {terminalStep >= 3 && <div className="text-amber-400">✓ 14 maintenance findings detected</div>}
-            {terminalStep >= 4 && (
-              <div className="pl-4 text-slate-400 space-y-0.5 text-xs">
-                <div>• 2 exact duplicates (helpers_old.js, README_old.md)</div>
-                <div>• 3 stale TODO / FIXME markers (auth.py)</div>
-                <div>• 1 broken documentation link (legacy_guide.md)</div>
-                <div>• 1 potentially dead module (unused_service.py)</div>
-                <div className="text-rose-400">• 1 exposed secret (redacted and blocked)</div>
-              </div>
-            )}
-            {terminalStep >= 5 && (
-              <div className="pt-2 text-slate-300">
-                <span>AI reasoning with local model (llama3.2:1b)...</span>
-                <div className="text-emerald-400">[████████████████████░░] 88% — 4 Safe Fixes Verified</div>
-              </div>
-            )}
-            {terminalStep >= 6 && (
-              <div className="pt-2 text-emerald-400 font-bold flex items-center justify-between">
-                <span>✓ Health score calculated: 62 → 92 / 100</span>
-                <Link 
-                  href="/app/repository"
-                  className="text-xs bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded hover:bg-emerald-500/30 transition flex items-center gap-1.5"
-                >
-                  <Play className="w-3 h-3 fill-emerald-300" />
-                  Connect Your Repository
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white leading-[1.08]">
+              <span className="block">Your code is messy.</span>
+              <span className="block text-emerald-400 font-mono">You don&apos;t have to be.</span>
+              <span className="block text-2xl sm:text-4xl text-slate-400 font-normal mt-2">
+                RepoJanitor cleans up after you.
+              </span>
+            </h1>
 
-        {/* Feature Highlights Grid */}
-        <div id="features" className="w-full mt-24 text-left grid md:grid-cols-3 gap-6 font-sans">
-          <div className="p-6 rounded-xl border border-slate-800 bg-[#0d1322]/60 backdrop-blur">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-white text-base mb-2">Deterministic Safety Gate</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              AI proposals are passed through a strict SafetyGate. Actions are classified as SAFE, REVIEW, or BLOCKED. Secrets and .git are never exposed or touched.
+            <p className="mx-auto max-w-2xl text-sm sm:text-base text-slate-400 leading-relaxed font-sans">
+              Enter any public GitHub repository or local codebase. RepoJanitor discovers copy-paste duplicates, stale TODOs, dead modules, and documentation debt — reasons safely with Google Gemma 2 & Gemini, and fixes issues with one-click pull requests.
             </p>
-          </div>
 
-          <div className="p-6 rounded-xl border border-slate-800 bg-[#0d1322]/60 backdrop-blur">
-            <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4">
-              <Cpu className="w-5 h-5" />
+            {/* DIRECT REPO INPUT COMPONENT */}
+            <div className="pt-4">
+              <RepoInput />
             </div>
-            <h3 className="font-semibold text-white text-base mb-2">Open-Weight Local AI</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Powered by Ollama with Qwen2.5, Llama, or Gemma. Your proprietary source code never leaves your local machine or leaks to closed external clouds.
-            </p>
-          </div>
 
-          <div className="p-6 rounded-xl border border-slate-800 bg-[#0d1322]/60 backdrop-blur">
-            <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4">
-              <GitBranch className="w-5 h-5" />
+            {/* LIVE TERMINAL VISUAL */}
+            <div className="max-w-2xl mx-auto pt-8 text-left font-mono">
+              <div className="rounded-xl border border-slate-800 bg-[#0c101c] shadow-2xl overflow-hidden">
+                <div className="px-4 py-2.5 bg-[#080b14] border-b border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
+                    <span className="ml-2 text-slate-300 font-semibold">repojanitor --scan --ai</span>
+                  </div>
+                  <span className="text-emerald-400 text-[11px]">SafetyGate Active</span>
+                </div>
+                <div className="p-4 space-y-1.5 text-xs text-slate-300">
+                  <div className="text-slate-400 font-bold">Scanning repository...</div>
+                  <div className="text-emerald-400 flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>247 files indexed across 18 directories</span>
+                  </div>
+                  <div className="text-emerald-400 flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Git branch and commit history analyzed</span>
+                  </div>
+                  <div className="text-amber-300 flex items-center gap-2">
+                    <Search className="w-3.5 h-3.5" />
+                    <span>31 potential maintenance issues discovered</span>
+                  </div>
+                  <div className="pl-5 text-slate-400 space-y-0.5 text-[11px]">
+                    <div>• 6 exact duplicate files (helpers_old.js, utils_copy.py)</div>
+                    <div>• 9 stale TODO/FIXME comments older than 90 days</div>
+                    <div>• 4 broken README internal documentation links</div>
+                    <div>• 3 abandoned modules with 0 imports</div>
+                  </div>
+                  <div className="pt-2 text-cyan-300 flex items-center gap-2">
+                    <Cpu className="w-3.5 h-3.5" />
+                    <span>AI Reasoning (Gemma 2 / Gemini)...</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                    <span>[████████████████░░] 88%</span>
+                    <span className="text-[10px] text-slate-400">Classifying Risk: SAFE / REVIEW / BLOCKED</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h3 className="font-semibold text-white text-base mb-2">Isolated Git Branch & PR</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              RepoJanitor never commits to master or main. It creates an isolated branch, verifies changes by running tests, generates a full diff, and prepares a Pull Request.
-            </p>
           </div>
-        </div>
+        </section>
+
+        {/* WHAT YOU GET SECTION */}
+        <section id="features" className="py-16 border-t border-slate-800/80 bg-[#0b0f1a]">
+          <div className="max-w-5xl mx-auto px-6 space-y-10">
+            <div className="text-center space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">
+                CORE CAPABILITIES
+              </span>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight">
+                Built to reward laziness with flawless repository hygiene
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Search className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-white text-base">Static Detector Suite</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Deterministic SHA-256 duplicate hashing, AST dead code analysis, broken link validation, and stale TODO parsing.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <Cpu className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-white text-base">Gemma 2 & Gemini AI</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Structured reasoning with Google Gemma 2 / Gemini API for cloud deployments, or local Ollama for 100% offline development.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-white text-base">Strict SafetyGate</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  AI cannot run arbitrary commands. Changes are partitioned into SAFE, REVIEW, and BLOCKED with automatic file backups.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                  <GitBranch className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-white text-base">Isolated Git Branches</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Never touches main or master. Checks out clean janitor branches, runs allowlisted tests, and formats full Pull Requests.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* EXAMPLE ROASTS SECTION */}
+        <section id="roasts" className="py-16 border-t border-slate-800/80 bg-[#090d16]">
+          <div className="max-w-4xl mx-auto px-6 space-y-8">
+            <div className="text-center space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">
+                THE JANITOR&apos;S ROAST
+              </span>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight">
+                Brutal honesty. Zero developer shame.
+              </h2>
+              <p className="text-xs text-slate-400">
+                Every analysis generates an entertaining diagnosis of your maintenance procrastination.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 font-mono text-xs">
+              <div className="p-5 rounded-xl border border-emerald-500/30 bg-[#0e1422] space-y-3">
+                <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                  <span>🦥</span>
+                  <span>THE TIRED REFACTOR</span>
+                </div>
+                <p className="text-slate-300 italic font-sans leading-relaxed">
+                  &ldquo;This repository scored 58/100. It looks like a codebase where someone promised &apos;I will refactor this next sprint&apos; and then sprinted in the exact opposite direction. You have 3 files named helpers_old.js that haven&apos;t been opened since 2023.&rdquo;
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-emerald-500/30 bg-[#0e1422] space-y-3">
+                <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                  <span>🧹</span>
+                  <span>THE TODO ARCHEOLOGIST</span>
+                </div>
+                <p className="text-slate-300 italic font-sans leading-relaxed">
+                  &ldquo;We spotted 14 stale TODO comments. At this point, those TODOs qualify as historical artifacts rather than code tasks. Anyone trying to follow your README setup guide will need a search and rescue team.&rdquo;
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* HOW IT WORKS SECTION */}
+        <section id="how-it-works" className="py-16 border-t border-slate-800/80 bg-[#0b0f1a]">
+          <div className="max-w-4xl mx-auto px-6 space-y-10">
+            <div className="text-center space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">
+                WORKFLOW
+              </span>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight">
+                The 6-Step Safety Pipeline
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-2">
+                <div className="text-emerald-400 font-bold text-sm">01 / SCAN & INDEX</div>
+                <p className="text-slate-400 font-sans leading-relaxed">
+                  Scans file tree, computes hashes for duplicates, checks broken docs, and gathers context while redacting all secrets.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-2">
+                <div className="text-cyan-400 font-bold text-sm">02 / REASON & ROAST</div>
+                <p className="text-slate-400 font-sans leading-relaxed">
+                  Gemma 2 or Gemini evaluates each finding, explains root causes, calculates the Health Score, and crafts the maintainer roast.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-2">
+                <div className="text-amber-400 font-bold text-sm">03 / SAFETY GATE</div>
+                <p className="text-slate-400 font-sans leading-relaxed">
+                  Strict deterministic validation prevents path traversal, blocks secret tampering, and categorizes actions by risk level.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-2">
+                <div className="text-indigo-400 font-bold text-sm">04 / CONTROLLED EXECUTION</div>
+                <p className="text-slate-400 font-sans leading-relaxed">
+                  Approved actions are dispatched via predefined handlers with full snapshot rollback backups in place.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-2">
+                <div className="text-emerald-400 font-bold text-sm">05 / TEST VALIDATION</div>
+                <p className="text-slate-400 font-sans leading-relaxed">
+                  Executes allowlisted project test commands (`pytest`, `npm test`) to verify changes didn&apos;t break logic.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#0d1322] space-y-2">
+                <div className="text-purple-400 font-bold text-sm">06 / BRANCH & PULL REQUEST</div>
+                <p className="text-slate-400 font-sans leading-relaxed">
+                  Creates an isolated `repo-janitor/cleanup-*` branch, provides an interactive diff, and publishes a GitHub PR.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* BOTTOM CTA */}
+        <section className="py-20 border-t border-slate-800/80 bg-gradient-to-b from-[#090d16] to-[#0d1424] text-center">
+          <div className="max-w-2xl mx-auto px-6 space-y-6">
+            <span className="text-4xl">🦥</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
+              Ready to clean up the code you&apos;ve been putting off?
+            </h2>
+            <p className="text-slate-400 text-sm">
+              Paste your repository URL above or launch the interactive dashboard.
+            </p>
+            <div className="pt-2 flex justify-center">
+              <Link
+                href="/app"
+                className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/40 text-sm font-mono"
+              >
+                <span>Launch RepoJanitor</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 px-6 py-6 text-center text-xs text-slate-500 font-mono">
-        RepoJanitor • Hacktoberfest Open-Source AI Challenge 2026 • Week 3: "Slow and Steady" • Built with open-weight AI.
+      {/* FOOTER */}
+      <footer className="border-t border-slate-800/80 py-8 px-6 text-center text-xs font-mono text-slate-500 bg-[#080c14] space-y-2">
+        <div className="flex items-center justify-center gap-2 text-slate-400">
+          <span>Built by Rudra Malvankar for</span>
+          <span className="text-emerald-400 font-bold">Hacktoberfest 2026 Open-Source AI Challenge</span>
+        </div>
+        <div>
+          Licensed under MIT. Open-weight intelligence with Google Gemma 2 & Ollama.
+        </div>
       </footer>
     </div>
   );

@@ -32,6 +32,7 @@ class RepositoryResponse(BaseModel):
     is_demo: bool
     health_score: int
     health_breakdown: Dict[str, Any]
+    roast: Optional[str] = None
     created_at: datetime.datetime
     updated_at: datetime.datetime
 

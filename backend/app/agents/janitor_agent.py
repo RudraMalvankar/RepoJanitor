@@ -51,6 +51,33 @@ class JanitorAgent:
         self.db.add(event)
         self.db.commit()
 
+    def _generate_maintainer_roast(self, findings: List[Dict[str, Any]], health_score: int, repo_name: str) -> str:
+        """Generates a hilarious, witty, yet constructive maintainer roast."""
+        dupes = [f for f in findings if f.get("category") == "duplicate"]
+        todos = [f for f in findings if f.get("category") == "todo"]
+        dead = [f for f in findings if f.get("category") == "dead_code"]
+        docs = [f for f in findings if f.get("category") == "documentation"]
+
+        roast_lines = []
+        if health_score >= 85:
+            roast_lines.append(f"Look at {repo_name}, showing off with {health_score}/100. Are you trying to impress linters or did you just start this project yesterday?")
+        elif health_score >= 60:
+            roast_lines.append(f"{repo_name} scored {health_score}/100. It's not catastrophic, but it definitely looks like a codebase where someone promised 'I will refactor this next sprint' and then sprinted in the opposite direction.")
+        else:
+            roast_lines.append(f"{repo_name} scored {health_score}/100. This repository is currently held together by digital duct tape, caffeine, and unconditional developer optimism.")
+
+        if dupes:
+            roast_lines.append(f"You have {len(dupes)} duplicate files sitting here. Ctrl+C and Ctrl+V are keyboard shortcuts, not an architectural pattern.")
+        if todos:
+            roast_lines.append(f"We spotted {len(todos)} stale TODO comments. At this point, those TODOs qualify as historical artifacts rather than tasks.")
+        if docs:
+            roast_lines.append(f"Your documentation contains {len(docs)} broken references. Anyone following your README is going to need a search and rescue team.")
+        if dead:
+            roast_lines.append(f"There are {len(dead)} potentially abandoned files with zero imports. They're just squatting in your repository tree rent-free.")
+
+        roast_lines.append("Don't panic — RepoJanitor is ready to clean up the mess safely.")
+        return " ".join(roast_lines)
+
     async def run_scan(self) -> Scan:
         """Runs repository scan, generates findings, and updates health scores."""
         self.record_audit("SCAN_STARTED", "Repository scan started", {"path": self.repo_model.path})
@@ -69,9 +96,14 @@ class JanitorAgent:
         self.db.add(scan)
         self.db.commit()
 
-        # Update repository health score
+        # Update repository health score and roast
         self.repo_model.health_score = scan_results["health_score"]
         self.repo_model.health_breakdown = json.dumps(scan_results["health_breakdown"])
+        self.repo_model.roast = self._generate_maintainer_roast(
+            scan_results["findings"],
+            scan_results["health_score"],
+            self.repo_model.name
+        )
         self.db.commit()
 
         # Persist findings

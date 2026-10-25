@@ -18,6 +18,8 @@ import {
   Play
 } from "lucide-react";
 import { api, Repository, Finding } from "@/lib/api";
+import { ScoreCard } from "@/components/ScoreCard";
+import { RoastCard } from "@/components/RoastCard";
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
@@ -165,52 +167,10 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Main Score & Breakdown Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Health Score Gauge */}
-        <div className="p-6 rounded-xl border border-slate-800 bg-[#0c1220] flex flex-col items-center justify-center text-center">
-          <span className="text-xs uppercase tracking-wider font-mono text-slate-500 mb-2">
-            Repository Health Score
-          </span>
-          <div className="relative my-4 flex items-center justify-center">
-            <div className="w-36 h-36 rounded-full border-4 border-slate-800 flex items-center justify-center">
-              <div className="text-4xl font-extrabold font-mono text-white">
-                {repo.health_score}
-                <span className="text-sm font-normal text-slate-500"> / 100</span>
-              </div>
-            </div>
-          </div>
-          <p className="text-xs font-mono text-emerald-400 mt-1 flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            {repo.health_score >= 80 ? "Healthy Repository" : "Maintenance Recommended"}
-          </p>
-        </div>
-
-        {/* Health Breakdown Bars */}
-        <div className="md:col-span-2 p-6 rounded-xl border border-slate-800 bg-[#0c1220] flex flex-col justify-center space-y-4">
-          <h2 className="text-sm font-semibold font-mono text-slate-300 uppercase tracking-wider">
-            Health Dimension Breakdown
-          </h2>
-
-          <div className="space-y-3 font-mono text-xs">
-            {Object.entries(breakdown).map(([key, val]) => (
-              <div key={key} className="space-y-1">
-                <div className="flex justify-between text-slate-400">
-                  <span className="capitalize">{key.replace("_", " ")}</span>
-                  <span className="text-slate-200 font-bold">{val} / 100</span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full ${
-                      val >= 80 ? "bg-emerald-500" : (val >= 60 ? "bg-amber-500" : "bg-rose-500")
-                    }`} 
-                    style={{ width: `${val}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* ReadMeRoast-style Circular Gauge ScoreCard & The Janitor's Roast */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ScoreCard score={repo.health_score} breakdown={breakdown} />
+        <RoastCard roast={repo.roast || "Scanning your repository for clutter, duplicate utilities, and stale TODOs..."} repoName={repo.name} score={repo.health_score} />
       </div>
 
       {/* Stats Cards Grid */}

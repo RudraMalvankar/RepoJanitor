@@ -76,21 +76,38 @@ async def update_settings(update: SettingsUpdate):
 
 @router.post("/repos/scan", response_model=RepositoryResponse)
 async def create_or_scan_repo(payload: RepositoryCreate, db: Session = Depends(get_db)):
-    repo_path = payload.path
-    if not repo_path:
-        raise HTTPException(status_code=400, detail="Repository path is required.")
+    raw_input = (payload.path or payload.url or "").strip()
+    if not raw_input:
+        raise HTTPException(status_code=400, detail="Repository path or GitHub URL is required.")
 
-    if not os.path.exists(repo_path):
-        raise HTTPException(status_code=404, detail=f"Repository path does not exist on disk: {repo_path}")
+    # Check if input is a GitHub URL or owner/repo format
+    is_remote = (
+        raw_input.startswith("http://")
+        or raw_input.startswith("https://")
+        or raw_input.startswith("git@")
+        or ("/" in raw_input and "\\" not in raw_input and not os.path.exists(raw_input))
+    )
+
+    if is_remote:
+        try:
+            repo_path, repo_name = GitService.clone_or_update(raw_input)
+            repo_url = raw_input if raw_input.startswith("http") else f"https://github.com/{raw_input}"
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to clone remote repository: {str(e)}")
+    else:
+        repo_path = os.path.abspath(raw_input)
+        if not os.path.exists(repo_path):
+            raise HTTPException(status_code=404, detail=f"Repository path does not exist on disk: {repo_path}")
+        repo_name = os.path.basename(os.path.normpath(repo_path)) or "repository"
+        repo_url = payload.url
 
     # Check if already registered
     repo = db.query(Repository).filter(Repository.path == repo_path).first()
     if not repo:
-        repo_name = os.path.basename(os.path.normpath(repo_path)) or "repository"
         repo = Repository(
             name=repo_name,
             path=repo_path,
-            url=payload.url,
+            url=repo_url,
             is_demo=False
         )
         db.add(repo)
@@ -110,6 +127,7 @@ async def create_or_scan_repo(payload: RepositoryCreate, db: Session = Depends(g
         is_demo=repo.is_demo,
         health_score=repo.health_score,
         health_breakdown=json.loads(repo.health_breakdown),
+        roast=repo.roast,
         created_at=repo.created_at,
         updated_at=repo.updated_at
     )
@@ -128,6 +146,7 @@ def get_repository(repo_id: str, db: Session = Depends(get_db)):
         is_demo=repo.is_demo,
         health_score=repo.health_score,
         health_breakdown=json.loads(repo.health_breakdown),
+        roast=repo.roast,
         created_at=repo.created_at,
         updated_at=repo.updated_at
     )

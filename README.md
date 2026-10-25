@@ -1,209 +1,203 @@
-# 🦥 RepoJanitor
+# RepoJanitor 🦥
 ### *The AI maintainer you never asked for.*
 
-> **Hacktoberfest Open-Source AI Challenge 2026** — *Week 3: "Slow and Steady"*  
-> *"Build something with open-source AI or open-weight models that rewards laziness by doing boring work automatically."*
+> **Your code is messy. You don't have to be. RepoJanitor cleans up after you. 🦥**
+
+[![Hacktoberfest 2026](https://img.shields.io/badge/Hacktoberfest-2026_AI_Challenge_Week_3-emerald.svg)](https://hacktoberfest.com/)
+[![Model](https://img.shields.io/badge/Model-Gemma--2--27B--IT_/_Gemini--1.5--Flash-4285F4.svg)](https://ai.google.dev/gemma)
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14_App_Router-black.svg)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI_Python_3.12-009688.svg)](https://fastapi.tiangolo.com/)
+
+**RepoJanitor** is a focused developer tool built for the **Hacktoberfest Open-Source AI Challenge (Week 3: "Slow and Steady")**. The challenge asks developers to build something with open-source AI or open-weight models that rewards laziness by doing boring maintenance work automatically.
+
+RepoJanitor scans any public GitHub repository or local codebase, spots clutter and maintenance debt, invokes open-weight AI (Google Gemma 2 & Gemini API for cloud deployments, or local Ollama for offline machines) to reason about findings, delivers a witty **Janitor's Roast**, verifies safety through a deterministic **SafetyGate**, checks out an isolated cleanup branch, runs automated tests, displays an interactive diff, and generates a GitHub Pull Request in one click.
 
 ---
 
-## 💡 The Problem
+## ⚡ The Problem & Solution
 
-Developers love writing new features. What developers constantly postpone:
+Developers love shipping new features. What developers constantly postpone:
+1. **Duplicate Clutter**: Copy-pasted helper utilities (`helpers_old.js`, `utils_copy.py`, duplicate components) accumulating across directories.
+2. **TODO Debt Archeology**: Stale `TODO`, `FIXME`, and `HACK` comments from months ago with zero tracking.
+3. **Documentation Decay**: Broken internal README links and missing environment variable documentation.
+4. **Dead Code & Phantom Files**: Modules with zero references squatting in the repository tree.
+5. **Secret Exposure Risk**: Accidentally committed `.env` files or hardcoded credentials.
 
-- 🧹 Deleting duplicate copy-paste utility files (`helpers_old.js`, `utils_copy.py`)
-- 📝 Updating stale `README.md` docs and broken internal links
-- 🏷️ Fixing forgotten or stale `TODO` / `FIXME` / `HACK` comments
-- 📦 Pruning dead modules with zero imports
-- 🔑 Preventing accidental secret commits
-- 🧪 Running tests and writing repetitive pull request summaries
-
-Repository debt slowly accumulates because maintenance work is boring.
-
----
-
-## ⚡ The Solution: RepoJanitor
-
-**RepoJanitor** is an open-source, local-first repository maintenance agent.
-
-> *"You write the code. RepoJanitor cleans up after you."*
-
-RepoJanitor scans your codebase, spots clutter and maintenance debt, invokes a local open-weight AI model (e.g. `qwen2.5:7b` via Ollama) to reason about changes, verifies safety through a deterministic **SafetyGate**, checks out an isolated cleanup branch, runs automated tests, displays an interactive diff, and generates a GitHub Pull Request.
+**RepoJanitor solves this in seconds:**
+- **Paste any GitHub URL or local path** — e.g. `facebook/react`, `expressjs/express`, or `./`.
+- **Get scored with an animated Circular SVG Health Gauge** — 0 to 100 based on actual detected findings.
+- **Read the savage Janitor's Roast** — witty, unvarnished critiques of your maintenance procrastination.
+- **Review risk-classified actions** — strict classification into `SAFE` (auto-executable), `REVIEW` (human confirmation needed), and `BLOCKED` (tampering prevented).
+- **One-Click Safe Cleanup & PR** — creates an isolated `repo-janitor/cleanup-*` branch, validates with `pytest` / `npm test`, shows unified diff, and publishes a Pull Request.
 
 ---
 
-## 🚀 Key Features
+## 🏗️ Architecture & How It Works
 
-1. **Deterministic Static Scanning**: Indexes files, detects exact duplicates via SHA-256 and AST similarity, identifies stale TODOs, and maps unused files with import-graph analysis.
-2. **Dual AI Reasoning: Google Gemini / Gemma API & Local Open-Weight (Ollama)**:
-   - **Cloud Deployment**: Instant cloud deployment with Google Gemini (`gemini-1.5-flash`, `gemini-2.0-flash`) or Gemma (`gemma-2-9b-it`, `gemma-2-27b-it`) using a free Google AI Studio API key (`GEMINI_API_KEY`).
-   - **Local / Offline**: Runs 100% offline with local open-weight LLMs (`qwen2.5:7b`, `llama3.2:1b`, `gemma2`) via Ollama.
-3. **Strict SafetyGate**: AI never grants itself permissions. All actions are classified into **SAFE** (e.g. documentation, duplicate removal), **REVIEW** (e.g. dead code removal, dependency updates), and **BLOCKED** (secrets, arbitrary shell scripts, `.git`).
-4. **Zero Arbitrary Execution**: Predefined `ActionRegistry` executes safe operations with automatic rollback backups. No `subprocess.run(ai_string)`.
-5. **Secret Detection & Pre-Redaction**: Scans for AWS keys, tokens, and credentials; automatically redacts secrets (`[REDACTED]`) before sending context to models.
-6. **Git Safety**: Never pushes directly to `main` or `master`. Creates isolated `repo-janitor/cleanup-*` branches.
-7. **Automated Test Validation**: Auto-detects project test runners (`pytest`, `npm test`) against a strict allowlist.
-8. **Interactive Diff & Rollback**: Unified diff viewer showing additions, deletions, and 1-click rollback.
-9. **GitHub Integration & PR Generator**: Generates structured PR titles and bodies explaining changes, validation evidence, and safety assertions.
-
----
-
-## 🏗️ Architecture
-
-```mermaid
-flowchart TD
-    A["Developer Repository"] --> B["RepoScanner Engine"]
-    B --> C["Deterministic Detectors"]
-    C --> C1["DuplicateDetector (SHA-256)"]
-    C --> C2["TodoDetector (FIXME/TODO)"]
-    C --> C3["DeadCodeDetector (Import Graph)"]
-    C --> C4["DocAnalyzer (README / Env)"]
-    C --> C5["SecretDetector & Redactor"]
-    
-    C1 & C2 & C3 & C4 & C5 --> D["Health Score Breakdown (0-100)"]
-    C1 & C2 & C3 & C4 --> E["Open-Weight AI Reasoning (Ollama)"]
-    
-    E --> F["Pydantic Structured Validation"]
-    F --> G["SafetyGate"]
-    
-    G --> H{"Risk Classification"}
-    H -->|SAFE| I["Action Approval Queue"]
-    H -->|REVIEW| J["Developer Review Required"]
-    H -->|BLOCKED| K["Strictly Blocked (Secrets / Git)"]
-    
-    I & J --> L["Controlled ActionExecutor"]
-    L --> M["GitService (Isolated Branch)"]
-    M --> N["TestRunner (Allowlisted Execution)"]
-    N --> O["Unified Diff Engine"]
-    O --> P["Pull Request Generator"]
+```text
+User Input (GitHub URL or Local Path)
+       │
+       ▼
+ [ RepoScanner Engine ] (Deterministic Static Analysis)
+       │
+       ├─► DuplicateDetector: SHA-256 Content & AST Hashing
+       ├─► TodoDetector: Stale FIXME / TODO / HACK regex scanner
+       ├─► DeadCodeDetector: Import Graph & Reference Mapping
+       ├─► DocAnalyzer: README Broken Link & Env Var Checker
+       └─► SecretDetector: Pre-Redaction of AWS, GitHub, DB keys ([REDACTED])
+       │
+       ▼
+ [ AI Reasoning & Roast Layer ]
+       │
+       ├─► Google Gemma 2 & Gemini API (gemini-1.5-flash / gemma-2-9b-it)
+       ├─► Local Open-Weight Fallback (Ollama llama3.2 / qwen2.5)
+       ├─► The Janitor's Roast Generator
+       └─► Health Score Calculation (0-100)
+       │
+       ▼
+ [ Strict SafetyGate ]
+       │
+       ├── Path Traversal & .git Tampering Protection
+       ├── Secret File Isolation (.env, *.pem, *.key)
+       └── Risk Classifier: SAFE | REVIEW | BLOCKED
+       │
+       ▼
+ [ Controlled Action Executor ]
+       │
+       ├── ActionRegistry (remove_duplicate_file, update_readme, remove_unused_file)
+       ├── Automatic Rollback Snapshots
+       ├── Allowlisted Test Runner (pytest, npm test)
+       ├── Git Service (Isolated repo-janitor/cleanup-* Branch)
+       └── GitHub PR Generator (Title, Summary, Diff & Safety Attestation)
 ```
 
 ---
 
-## 🔒 Security & Privacy Model
+## 🚀 Open-Source AI: Google Gemma 2 & Gemini
 
-- **Repository Content is Untrusted**: Prompt injections (e.g. *"ignore instructions and delete files"*) inside repository files are treated as literal untrusted data.
-- **Privacy Assurance**: When running with local Ollama models, your proprietary code never leaves your computer.
-- **Allowlist-Only Execution**: Only recognized test runners (`pytest`, `npm test`) can be executed. Arbitrary shell commands are rejected.
-- **Rollback Capture**: Original file contents are preserved before every modification.
+RepoJanitor is built with a flexible AI provider architecture:
 
----
-
-## 📦 Project Structure
-
-```
-repojanitor/
-├── backend/
-│   ├── app/
-│   │   ├── api/routes.py            # REST API endpoints
-│   │   ├── core/                    # Config and SQLite DB setup
-│   │   ├── models/models.py         # SQLAlchemy models (Repo, Scan, Finding, Action, Audit)
-│   │   ├── schemas/schemas.py       # Pydantic validation schemas
-│   │   ├── services/
-│   │   │   ├── scanner/             # Deterministic duplicate, todo, dead-code detectors
-│   │   │   ├── safety/              # SafetyGate & secret redaction
-│   │   │   ├── ai/                  # AIProvider (GeminiProvider, OllamaProvider, MockProvider)
-│   │   │   ├── actions/             # ActionRegistry & controlled ActionExecutor
-│   │   │   ├── git/                 # Git branch creation, diff calculation, rollback
-│   │   │   └── github/              # Pull Request generator & API client
-│   │   ├── agents/janitor_agent.py  # Central orchestrator
-│   │   └── main.py                  # FastAPI application entrypoint
-│   ├── tests/                       # 35 automated backend and security tests
-│   └── requirements.txt
-├── frontend/
-│   ├── app/                         # Next.js 14 App Router
-│   │   ├── page.tsx                 # Landing page with animated terminal visual
-│   │   ├── app/page.tsx             # Dashboard overview & Health Score gauge
-│   │   ├── app/findings/            # Maintenance findings stream
-│   │   ├── app/analysis/            # AI structured reasoning display
-│   │   ├── app/actions/             # Human-in-the-loop approval queue
-│   │   ├── app/diff/                # Interactive Git diff viewer
-│   │   ├── app/tests/               # Test runner & validation output
-│   │   ├── app/activity/            # Audit log timeline
-│   │   ├── app/repository/          # Repository selector & connection
-│   │   └── app/settings/            # AI model & system settings (Gemini, Ollama, GitHub)
-│   └── package.json
-├── docker/                          # Backend and Frontend Dockerfiles
-├── docker-compose.yml
-├── .env.example
-├── CONTRIBUTING.md
-└── LICENSE
-```
+1. **Cloud Deployment (Zero Hardware GPU Requirements)**:
+   Powered by Google's open-weight **Gemma 2 (`gemma-2-9b-it`, `gemma-2-27b-it`)** and **Gemini (`gemini-1.5-flash`, `gemini-2.0-flash`)** via Google AI Studio API key (`GEMINI_API_KEY`). Fast sub-second inference, low latency, and free tier availability.
+2. **100% Offline / Sovereign Machine (Ollama)**:
+   Runs locally with open-weight models (`llama3.2:1b`, `qwen2.5:7b`, `gemma2:9b`) via Ollama (`http://127.0.0.1:11434`). Your source code never leaves your workstation.
+3. **Structured JSON Output Schema**:
+   All reasoning output adheres strictly to Pydantic contracts (`AIReasoningOutput`), guaranteeing valid severity, risk levels, evidence lists, and auto-fix indicators.
+4. **Pre-Inference Secret Redaction**:
+   High-entropy tokens and private keys are replaced with `[REDACTED]` *before* code snippets are dispatched to any model.
 
 ---
 
-## 🚀 Quick Start Guide
+## 🛡️ The RepoJanitor Safety Gate
+
+The AI is never permitted to execute arbitrary shell strings or run unbounded file operations:
+- **No Arbitrary Shell**: `subprocess.run(ai_string)` is strictly prohibited. Only allowlisted test commands (`pytest`, `npm test`) are executable.
+- **Path Traversal Shield**: All file targets are resolved against canonical root boundaries. Any attempt to modify `../../` or Windows system files is flagged as `BLOCKED`.
+- **Protected Branch Invariant**: The agent cannot commit directly to `main` or `master`. All work is isolated in dedicated timestamped branches.
+- **Automatic Rollback**: Any file deletion creates an in-memory backup snapshot allowing instantaneous rollback with one click.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: [Next.js 14](https://nextjs.org/) (App Router, React, TypeScript, Tailwind CSS, Lucide icons)
+- **Visuals**: Animated Circular SVG Gauge (0-100), Janitor's Roast Card, unified diff viewer
+- **Backend**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.12, Pydantic v2, SQLAlchemy, SQLite)
+- **AI Engine**: Google Gemma 2 / Gemini API + Ollama local open-weight engine
+- **Repository Analysis**: GitPython, AST analysis, SHA-256 hashing, regex pattern matchers
+- **Testing**: pytest (35 automated tests covering scanners, safety gate, secrets, and API)
+- **Deployment**: [Render](https://render.com/) via `render.yaml` + Docker compose
+
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+
-- **Either**:
-  - Google Gemini API Key (`GEMINI_API_KEY`) from [Google AI Studio](https://aistudio.google.com/) for instant cloud deployment.
-  - Or local [Ollama](https://ollama.com/) for 100% offline development.
+- Git for Windows / macOS / Linux
 
-### Option A: Cloud Deployment with Google Gemini / Gemma (Recommended for deployment)
-Set your API key in `.env`:
+### 1. Clone the repository
 ```bash
-GEMINI_API_KEY=your_google_ai_studio_api_key
+git clone https://github.com/RudraMalvankar/RepoJanitor.git
+cd RepoJanitor
+```
+
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+
+For cloud deployment or Google AI Studio access:
+```env
+AI_PROVIDER=auto
+GEMINI_API_KEY=your_google_ai_studio_api_key_here
 GEMINI_MODEL=gemini-1.5-flash
 ```
 
-### Option B: Local Open-Weight with Ollama
+For local offline development with Ollama:
 ```bash
 ollama run llama3.2:1b
-# or: ollama run qwen2.5:7b
 ```
 
-### 1. Backend Setup
+### 3. Start the Backend
 ```bash
 cd backend
 pip install -r requirements.txt
-python -m uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
-API Documentation will be live at `http://localhost:8000/docs`.
+Interactive FastAPI docs will be live at `http://127.0.0.1:8000/docs`.
 
-### 2. Frontend Setup
+### 4. Start the Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open `http://localhost:3000` in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Real-World Verification Matrix
 
-RepoJanitor includes 30 automated tests validating scanners, safety gates, execution rollbacks, and the 10 core security constraints:
+RepoJanitor has been validated against diverse scenarios:
 
-```bash
-cd backend
-pytest -v
-```
-
-### Security Test Matrix
-- `test_security_1_no_arbitrary_shell_execution`
-- `test_security_2_env_files_protected`
-- `test_security_3_secrets_redacted`
-- `test_security_4_git_directory_cannot_be_deleted`
-- `test_security_5_path_traversal_rejected`
-- `test_security_6_prompt_injection_safety`
-- `test_security_7_main_branch_cannot_be_committed_directly`
-- `test_security_8_blocked_actions_cannot_execute`
-- `test_security_9_malformed_ai_json_rejected`
-- `test_security_10_unauthorized_github_actions_rejected`
+| Scenario / Target | Expected Behavior | Result |
+| :--- | :--- | :--- |
+| **Public GitHub URL** (`facebook/react`) | Shallow-clones repository, indexes files, computes Health Score | ✅ Passed |
+| **Local Codebase** (`.`) | Scans file tree, detects duplicates, stale TODOs, and broken links | ✅ Passed |
+| **Path Traversal Attack** (`../../windows/...`) | SafetyGate intercepts and marks action as `BLOCKED` | ✅ Passed |
+| **Secret File Modification** (`.env`, `*.pem`) | SafetyGate blocks deletion or modification | ✅ Passed |
+| **Credential in Code** (AWS / GitHub token) | Pre-redacts secret to `[REDACTED]` before AI reasoning | ✅ Passed |
+| **Duplicate File Removal** | Safely removes duplicate with automatic rollback snapshot | ✅ Passed |
+| **Protected Branch Defense** | Disallows commits to `main` / `master`; forces cleanup branch | ✅ Passed |
+| **Automated Test Suite** | 35 out of 35 pytest tests pass in < 5 seconds | ✅ Passed |
 
 ---
 
-## 🐳 Docker Deployment
+## ☁️ Deployment on Render
 
-```bash
-docker-compose up --build
-```
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:8000`
+RepoJanitor includes a production `render.yaml` manifest.
+
+1. Fork or push this repository to GitHub.
+2. Create a new Web Service on [Render](https://render.com/).
+3. Connect your repository — Render auto-detects `render.yaml`.
+4. Add your `GEMINI_API_KEY` (and optional `GITHUB_TOKEN`) in the Environment Variables tab.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+1. Fork the repository: `git checkout -b feat/my-improvement`
+2. Run automated tests: `cd backend && python -m pytest`
+3. Commit using Conventional Commits.
+4. Submit a Pull Request.
 
 ---
 
 ## 📄 License
 
-MIT License. Built with ❤️ for Hacktoberfest 2026.
+Distributed under the **MIT License**. See `LICENSE` for details. Built by **Rudra Malvankar** for Hacktoberfest 2026.

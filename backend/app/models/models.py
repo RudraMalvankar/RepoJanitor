@@ -18,6 +18,7 @@ class Repository(Base):
     is_demo = Column(Boolean, default=False)
     health_score = Column(Integer, default=100)
     health_breakdown = Column(Text, default="{}")  # JSON: documentation, quality, hygiene, tests, maintenance
+    roast = Column(Text, nullable=True)  # Witty, constructive maintainer roast
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 

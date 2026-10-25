@@ -12,6 +12,43 @@ class GitService:
     Calculates unified diffs and stats.
     """
 
+    @classmethod
+    def clone_or_update(cls, repo_url: str, target_dir: Optional[str] = None) -> Tuple[str, str]:
+        """
+        Shallow clones a public remote repository into a local cache directory.
+        Returns (local_path, repo_name).
+        """
+        import re, tempfile
+        clean_url = repo_url.strip()
+        # Handle github.com/owner/repo or owner/repo format
+        if not clean_url.startswith("http://") and not clean_url.startswith("https://") and not clean_url.startswith("git@"):
+            clean_url = clean_url.replace("github.com/", "")
+            clean_url = f"https://github.com/{clean_url}"
+
+        # Clean trailing slashes
+        clean_url = clean_url.rstrip("/")
+
+        # Extract repo name
+        parts = clean_url.split("/")
+        repo_name = parts[-1].replace(".git", "") if parts else "repo"
+
+        cache_base = target_dir or os.path.join(tempfile.gettempdir(), "repojanitor_repos")
+        os.makedirs(cache_base, exist_ok=True)
+        dest_path = os.path.join(cache_base, repo_name)
+
+        if os.path.exists(dest_path) and os.path.exists(os.path.join(dest_path, ".git")):
+            try:
+                repo = Repo(dest_path)
+                # Quick fetch to ensure latest
+                repo.remotes.origin.pull()
+                return dest_path, repo_name
+            except Exception:
+                return dest_path, repo_name
+
+        # Shallow clone to ensure speed
+        Repo.clone_from(clean_url, dest_path, depth=1)
+        return dest_path, repo_name
+
     def __init__(self, repo_path: str):
         self.repo_path = os.path.abspath(repo_path)
         self._repo: Optional[Repo] = None
