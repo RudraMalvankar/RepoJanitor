@@ -96,9 +96,15 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2 px-2.5 py-1 rounded border border-slate-800 bg-[#0d1424]">
             <Cpu className="w-3.5 h-3.5 text-cyan-400" />
             <span className="text-slate-400">AI:</span>
-            <span className={healthStatus?.ollama_available ? "text-emerald-400" : "text-amber-400"}>
-              {healthStatus?.ollama_available ? "Ollama (llama3.2:1b)" : "Ollama (Offline)"}
-            </span>
+            {healthStatus?.gemini_configured || healthStatus?.ai_provider === "gemini" ? (
+              <span className="text-amber-400">
+                Gemini ({healthStatus?.gemini_model || "1.5-flash"})
+              </span>
+            ) : (
+              <span className={healthStatus?.ollama_available ? "text-emerald-400" : "text-slate-500"}>
+                {healthStatus?.ollama_available ? "Ollama Online" : "Ollama Offline"}
+              </span>
+            )}
           </div>
 
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded border border-slate-800 bg-[#0d1424] text-emerald-400">

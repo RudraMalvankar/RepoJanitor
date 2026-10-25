@@ -34,7 +34,9 @@ RepoJanitor scans your codebase, spots clutter and maintenance debt, invokes a l
 ## 🚀 Key Features
 
 1. **Deterministic Static Scanning**: Indexes files, detects exact duplicates via SHA-256 and AST similarity, identifies stale TODOs, and maps unused files with import-graph analysis.
-2. **Open-Weight AI Reasoning**: Uses local open-weight LLMs (Qwen2.5, Llama 3.2, Gemma 2) via Ollama. Replaces cloud API billing with private, offline-capable local intelligence.
+2. **Dual AI Reasoning: Google Gemini / Gemma API & Local Open-Weight (Ollama)**:
+   - **Cloud Deployment**: Instant cloud deployment with Google Gemini (`gemini-1.5-flash`, `gemini-2.0-flash`) or Gemma (`gemma-2-9b-it`, `gemma-2-27b-it`) using a free Google AI Studio API key (`GEMINI_API_KEY`).
+   - **Local / Offline**: Runs 100% offline with local open-weight LLMs (`qwen2.5:7b`, `llama3.2:1b`, `gemma2`) via Ollama.
 3. **Strict SafetyGate**: AI never grants itself permissions. All actions are classified into **SAFE** (e.g. documentation, duplicate removal), **REVIEW** (e.g. dead code removal, dependency updates), and **BLOCKED** (secrets, arbitrary shell scripts, `.git`).
 4. **Zero Arbitrary Execution**: Predefined `ActionRegistry` executes safe operations with automatic rollback backups. No `subprocess.run(ai_string)`.
 5. **Secret Detection & Pre-Redaction**: Scans for AWS keys, tokens, and credentials; automatically redacts secrets (`[REDACTED]`) before sending context to models.
@@ -42,7 +44,6 @@ RepoJanitor scans your codebase, spots clutter and maintenance debt, invokes a l
 7. **Automated Test Validation**: Auto-detects project test runners (`pytest`, `npm test`) against a strict allowlist.
 8. **Interactive Diff & Rollback**: Unified diff viewer showing additions, deletions, and 1-click rollback.
 9. **GitHub Integration & PR Generator**: Generates structured PR titles and bodies explaining changes, validation evidence, and safety assertions.
-10. **Interactive Demo Mode**: Includes an intentionally messy `demo-repository` to test the full lifecycle immediately without setup.
 
 ---
 
@@ -100,13 +101,13 @@ repojanitor/
 │   │   ├── services/
 │   │   │   ├── scanner/             # Deterministic duplicate, todo, dead-code detectors
 │   │   │   ├── safety/              # SafetyGate & secret redaction
-│   │   │   ├── ai/                  # AIProvider (Ollama & MockProvider)
+│   │   │   ├── ai/                  # AIProvider (GeminiProvider, OllamaProvider, MockProvider)
 │   │   │   ├── actions/             # ActionRegistry & controlled ActionExecutor
 │   │   │   ├── git/                 # Git branch creation, diff calculation, rollback
 │   │   │   └── github/              # Pull Request generator & API client
 │   │   ├── agents/janitor_agent.py  # Central orchestrator
 │   │   └── main.py                  # FastAPI application entrypoint
-│   ├── tests/                       # 30 automated backend and security tests
+│   ├── tests/                       # 35 automated backend and security tests
 │   └── requirements.txt
 ├── frontend/
 │   ├── app/                         # Next.js 14 App Router
@@ -119,9 +120,8 @@ repojanitor/
 │   │   ├── app/tests/               # Test runner & validation output
 │   │   ├── app/activity/            # Audit log timeline
 │   │   ├── app/repository/          # Repository selector & connection
-│   │   └── app/settings/            # AI model & system settings
+│   │   └── app/settings/            # AI model & system settings (Gemini, Ollama, GitHub)
 │   └── package.json
-├── demo-repository/                 # Seeded testbed repository with intentional issues
 ├── docker/                          # Backend and Frontend Dockerfiles
 ├── docker-compose.yml
 ├── .env.example
@@ -136,14 +136,24 @@ repojanitor/
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+
-- [Ollama](https://ollama.com/) (Optional: Mock Provider is included for zero-install demo)
+- **Either**:
+  - Google Gemini API Key (`GEMINI_API_KEY`) from [Google AI Studio](https://aistudio.google.com/) for instant cloud deployment.
+  - Or local [Ollama](https://ollama.com/) for 100% offline development.
 
-### 1. Start Ollama (Optional)
+### Option A: Cloud Deployment with Google Gemini / Gemma (Recommended for deployment)
+Set your API key in `.env`:
 ```bash
-ollama run qwen2.5:7b
+GEMINI_API_KEY=your_google_ai_studio_api_key
+GEMINI_MODEL=gemini-1.5-flash
 ```
 
-### 2. Backend Setup
+### Option B: Local Open-Weight with Ollama
+```bash
+ollama run llama3.2:1b
+# or: ollama run qwen2.5:7b
+```
+
+### 1. Backend Setup
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -151,7 +161,7 @@ python -m uvicorn app.main:app --reload --port 8000
 ```
 API Documentation will be live at `http://localhost:8000/docs`.
 
-### 3. Frontend Setup
+### 2. Frontend Setup
 ```bash
 cd frontend
 npm install

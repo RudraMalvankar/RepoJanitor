@@ -14,6 +14,7 @@ from app.schemas.schemas import (
 )
 from app.agents.janitor_agent import JanitorAgent
 from app.services.ai.ollama_provider import OllamaProvider
+from app.services.ai.gemini_provider import GeminiProvider
 from app.services.git.git_service import GitService
 from app.services.github.github_service import GitHubService
 
@@ -21,26 +22,38 @@ router = APIRouter()
 
 @router.get("/health")
 async def health_check():
+    gemini = GeminiProvider()
     ollama = OllamaProvider()
-    ai_online = await ollama.is_available()
+    gemini_online = bool(settings.GEMINI_API_KEY)
+    ollama_online = await ollama.is_available()
+    active_provider = "gemini" if (settings.AI_PROVIDER == "gemini" or (settings.AI_PROVIDER == "auto" and settings.GEMINI_API_KEY)) else settings.AI_PROVIDER
+
     return {
         "status": "healthy",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "ai_provider": settings.AI_PROVIDER,
-        "ollama_available": ai_online,
+        "ai_provider": active_provider,
+        "gemini_configured": bool(settings.GEMINI_API_KEY),
+        "gemini_model": settings.GEMINI_MODEL,
+        "ollama_available": ollama_online,
         "github_configured": bool(settings.GITHUB_TOKEN)
     }
 
 @router.get("/settings", response_model=SettingsResponse)
 async def get_settings():
     ollama = OllamaProvider()
-    ai_online = await ollama.is_available()
+    ollama_online = await ollama.is_available()
+    gemini_configured = bool(settings.GEMINI_API_KEY)
+    ai_available = gemini_configured or ollama_online
+    active_provider = "gemini" if (settings.AI_PROVIDER == "gemini" or (settings.AI_PROVIDER == "auto" and gemini_configured)) else settings.AI_PROVIDER
+
     return SettingsResponse(
-        ai_provider=settings.AI_PROVIDER,
+        ai_provider=active_provider,
+        gemini_api_key_configured=gemini_configured,
+        gemini_model=settings.GEMINI_MODEL,
         ollama_base_url=settings.OLLAMA_BASE_URL,
         ollama_model=settings.OLLAMA_MODEL,
-        ai_available=ai_online,
+        ai_available=ai_available,
         github_configured=bool(settings.GITHUB_TOKEN),
         scan_ignore_dirs=settings.SCAN_IGNORE_DIRS
     )
@@ -49,6 +62,10 @@ async def get_settings():
 async def update_settings(update: SettingsUpdate):
     if update.ai_provider:
         settings.AI_PROVIDER = update.ai_provider
+    if update.gemini_api_key is not None:
+        settings.GEMINI_API_KEY = update.gemini_api_key
+    if update.gemini_model:
+        settings.GEMINI_MODEL = update.gemini_model
     if update.ollama_base_url:
         settings.OLLAMA_BASE_URL = update.ollama_base_url
     if update.ollama_model:

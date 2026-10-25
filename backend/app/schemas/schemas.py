@@ -160,6 +160,8 @@ class AuditEventResponse(BaseModel):
 
 class SettingsResponse(BaseModel):
     ai_provider: str
+    gemini_api_key_configured: bool
+    gemini_model: str
     ollama_base_url: str
     ollama_model: str
     ai_available: bool
@@ -168,6 +170,8 @@ class SettingsResponse(BaseModel):
 
 class SettingsUpdate(BaseModel):
     ai_provider: Optional[str] = None
+    gemini_api_key: Optional[str] = None
+    gemini_model: Optional[str] = None
     ollama_base_url: Optional[str] = None
     ollama_model: Optional[str] = None
     github_token: Optional[str] = None

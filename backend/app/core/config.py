@@ -9,7 +9,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./repojanitor.db"
     
     # AI Configuration
-    AI_PROVIDER: str = "ollama"  # "ollama" or "mock"
+    AI_PROVIDER: str = os.getenv("AI_PROVIDER", "auto")  # "auto", "gemini", "ollama", "mock"
+    GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", None)
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
     OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
     AI_TIMEOUT_SECONDS: int = int(os.getenv("AI_TIMEOUT_SECONDS", "30"))

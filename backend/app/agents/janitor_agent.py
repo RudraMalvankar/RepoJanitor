@@ -8,6 +8,7 @@ from app.models.models import Repository, Scan, Finding, AIAnalysis, ProposedAct
 from app.services.scanner.repo_scanner import RepoScanner
 from app.services.ai.provider import AIProvider
 from app.services.ai.ollama_provider import OllamaProvider
+from app.services.ai.gemini_provider import GeminiProvider
 from app.services.ai.mock_provider import MockProvider
 from app.services.safety.safety_gate import SafetyGate
 from app.services.actions.executor import ActionExecutor
@@ -29,8 +30,13 @@ class JanitorAgent:
         if not self.repo_model:
             raise ValueError(f"Repository with id '{repo_id}' not found.")
 
-        # Dedicated Real Local AI Provider
-        self.ai_provider: AIProvider = OllamaProvider()
+        # Provider resolution: Gemini (cloud/deployment) or Ollama (local open-weight) or Mock
+        if settings.AI_PROVIDER == "gemini" or (settings.AI_PROVIDER == "auto" and settings.GEMINI_API_KEY):
+            self.ai_provider: AIProvider = GeminiProvider()
+        elif settings.AI_PROVIDER == "mock":
+            self.ai_provider: AIProvider = MockProvider()
+        else:
+            self.ai_provider: AIProvider = OllamaProvider()
 
         self.git_service = GitService(self.repo_model.path)
         self.github_service = GitHubService()
